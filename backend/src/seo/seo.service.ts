@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class SeoService {
-    private commonHashtags = {
+    private commonHashtags: Record<string, string[]> = {
         'Fashion': ['#FashionIndia', '#OOTDIndia', '#DesiSwag', '#StyleInspo', '#TrendingNow'],
         'Tech': ['#TechIndia', '#DigitalIndia', '#StartupLife', '#Innovation', '#Gadgets'],
         'Food': ['#FoodieIndia', '#DesiFood', '#StreetFoodIndia', '#Yummy', '#FoodPorn'],
