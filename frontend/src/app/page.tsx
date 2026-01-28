@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 dark:bg-black text-gray-900 dark:text-white">
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-        <h1 className="text-4xl font-bold">Social Media Command Center - LIVE 🚀</h1>
+        <h1 className="text-4xl font-bold">Social Media Command Center</h1>
 
         <p className="mt-3 text-2xl">
           Get started by logging in or creating an account.
