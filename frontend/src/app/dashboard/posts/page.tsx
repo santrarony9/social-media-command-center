@@ -71,6 +71,16 @@ export default function PostsPage() {
         }
     };
 
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this post?')) return;
+        try {
+            await api.delete(`/posts/${id}`);
+            setPosts(posts.filter(p => p.id !== id));
+        } catch (err) {
+            alert('Failed to delete post');
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -154,7 +164,7 @@ export default function PostsPage() {
                 ) : (
                     posts.map(post => (
                         <div key={post.id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border-l-4 border-purple-500 flex justify-between items-start">
-                            <div>
+                            <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className={`px-2 py-1 text-xs rounded font-bold ${post.status === 'PUBLISHED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                         {post.status}
@@ -166,8 +176,16 @@ export default function PostsPage() {
                                     <p className="text-xs text-indigo-400 mt-2">🕒 Scheduled for: {new Date(post.scheduledAt).toLocaleString()}</p>
                                 )}
                             </div>
-                            <div className="text-sm text-gray-400">
-                                {new Date(post.createdAt).toLocaleDateString()}
+                            <div className="flex flex-col items-end gap-2 ml-4">
+                                <div className="text-sm text-gray-400">
+                                    {new Date(post.createdAt).toLocaleDateString()}
+                                </div>
+                                <button
+                                    onClick={() => handleDelete(post.id)}
+                                    className="text-red-400 hover:text-red-500 text-xs border border-red-500/30 px-2 py-1 rounded bg-red-500/10 hover:bg-red-500/20 transition"
+                                >
+                                    🗑️ Delete
+                                </button>
                             </div>
                         </div>
                     ))

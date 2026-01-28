@@ -78,6 +78,16 @@ export default function AccountsPage() {
         }
     };
 
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure you want to disconnect this account?')) return;
+        try {
+            await api.delete(`/social-accounts/${id}`);
+            setAccounts(accounts.filter(a => a.id !== id));
+        } catch (err) {
+            alert('Failed to disconnect account');
+        }
+    };
+
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold dark:text-white">Connected Accounts 🌐</h1>
@@ -132,9 +142,17 @@ export default function AccountsPage() {
                     <p className="dark:text-gray-400">No accounts connected yet.</p>
                 ) : (
                     accounts.map((acc) => (
-                        <div key={acc.id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border-l-4 border-indigo-500">
-                            <h3 className="font-bold text-lg dark:text-white">{acc.platform}</h3>
-                            <p className="text-gray-600 dark:text-gray-300">@{acc.profileName}</p>
+                        <div key={acc.id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border-l-4 border-indigo-500 flex justify-between items-start">
+                            <div>
+                                <h3 className="font-bold text-lg dark:text-white">{acc.platform}</h3>
+                                <p className="text-gray-600 dark:text-gray-300">@{acc.profileName}</p>
+                            </div>
+                            <button
+                                onClick={() => handleDelete(acc.id)}
+                                className="text-red-400 hover:text-red-300 text-sm font-semibold"
+                            >
+                                Disconnect
+                            </button>
                         </div>
                     ))
                 )}
