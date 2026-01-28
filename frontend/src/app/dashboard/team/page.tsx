@@ -23,6 +23,13 @@ export default function TeamPage() {
     const [password, setPassword] = useState('');
     const [jobTitle, setJobTitle] = useState('');
 
+    // Assignment State
+    const [selectedClientId, setSelectedClientId] = useState('');
+    const [permissionLevel, setPermissionLevel] = useState('FULL_ACCESS');
+    const [showAssignModal, setShowAssignModal] = useState(false);
+    const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+    const [clients, setClients] = useState<any[]>([]);
+
     useEffect(() => {
         fetchEmployees();
     }, []);
@@ -35,6 +42,28 @@ export default function TeamPage() {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchClients = async () => {
+        try {
+            const res = await api.get('/clients');
+            setClients(res.data);
+        } catch (err) { console.error(err); }
+    };
+
+    const handleAssign = async () => {
+        if (!selectedEmployee || !selectedClientId) return;
+        try {
+            await api.post('/admin/assign', {
+                userId: selectedEmployee.id,
+                clientId: selectedClientId,
+                permissionLevel
+            });
+            setShowAssignModal(false);
+            alert(`Access granted to ${selectedEmployee.name}`);
+        } catch (err) {
+            alert('Failed to assign client');
         }
     };
 
@@ -110,10 +139,50 @@ export default function TeamPage() {
                 </div>
             )}
 
+            {/* Assign Client Modal */}
+            {showAssignModal && selectedEmployee && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-[#0f0f1a] border border-white/10 p-8 rounded-2xl w-full max-w-md shadow-2xl">
+                        <h2 className="text-xl font-bold text-white mb-4">Assign Client to {selectedEmployee.name}</h2>
+                        <p className="text-gray-400 mb-6 text-sm">Select which client this employee can access and their permission level.</p>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-gray-400 text-sm">Select Client</label>
+                                <select
+                                    className="w-full p-2 rounded bg-black/50 border border-white/20 text-white"
+                                    onChange={(e) => setSelectedClientId(e.target.value)}
+                                >
+                                    <option value="">-- Choose Brand --</option>
+                                    {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="text-gray-400 text-sm">Permission Level</label>
+                                <select
+                                    className="w-full p-2 rounded bg-black/50 border border-white/20 text-white"
+                                    onChange={(e) => setPermissionLevel(e.target.value)}
+                                >
+                                    <option value="FULL_ACCESS">Full Access (Post, Delete, Analytics)</option>
+                                    <option value="CONTENT_ONLY">Content Only (Draft, Upload)</option>
+                                    <option value="ANALYTICS_ONLY">Analytics Only (View Reports)</option>
+                                </select>
+                            </div>
+
+                            <div className="flex gap-4 pt-4">
+                                <button onClick={() => setShowAssignModal(false)} className="flex-1 p-2 text-gray-400 hover:text-white">Cancel</button>
+                                <button onClick={handleAssign} className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-2 rounded font-bold hover:shadow-lg hover:shadow-indigo-500/50">Confirm Assignment</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Employee List */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {employees.map(emp => (
-                    <div key={emp.id} className="bg-white/5 border border-white/10 p-6 rounded-xl hover:border-indigo-500/30 transition group">
+                    <div key={emp.id} className="bg-white/5 border border-white/10 p-6 rounded-xl hover:border-indigo-500/30 transition group relative">
                         <div className="flex items-center gap-4 mb-4" >
                             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl">
                                 {emp.name.charAt(0)}
@@ -135,7 +204,12 @@ export default function TeamPage() {
                             </p>
                         </div>
                         <div className="mt-6 pt-4 border-t border-white/5 flex gap-2">
-                            <button className="flex-1 text-xs bg-white/5 hover:bg-white/10 py-2 rounded text-gray-300">Assign Client</button>
+                            <button
+                                onClick={() => { setSelectedEmployee(emp); fetchClients(); setShowAssignModal(true); }}
+                                className="flex-1 text-xs bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 py-2 rounded border border-indigo-500/30 transition font-semibold"
+                            >
+                                Assign Client
+                            </button>
                             <button className="flex-1 text-xs bg-white/5 hover:bg-red-500/20 py-2 rounded text-gray-300 hover:text-red-400">Disable</button>
                         </div>
                     </div>
