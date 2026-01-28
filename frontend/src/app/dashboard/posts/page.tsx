@@ -149,8 +149,8 @@ export default function PostsPage() {
                                         type="button"
                                         onClick={() => togglePlatform(p.id)}
                                         className={`flex items-center gap-2 px-3 py-2 rounded border transition ${selectedPlatforms.includes(p.id)
-                                                ? 'bg-indigo-600 text-white border-indigo-600'
-                                                : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                            ? 'bg-indigo-600 text-white border-indigo-600'
+                                            : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                                             }`}
                                     >
                                         <span>{p.icon}</span>
@@ -170,8 +170,8 @@ export default function PostsPage() {
                                         type="button"
                                         onClick={() => setMediaType(type)}
                                         className={`px-4 py-1.5 rounded-md text-sm font-bold transition ${mediaType === type
-                                                ? 'bg-white dark:bg-gray-700 shadow text-indigo-600 dark:text-white'
-                                                : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                            ? 'bg-white dark:bg-gray-700 shadow text-indigo-600 dark:text-white'
+                                            : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                                             }`}
                                     >
                                         {type}
@@ -203,19 +203,57 @@ export default function PostsPage() {
                             </button>
                         </div>
 
-                        {/* 5. Media URL Input (If Image/Video) */}
+                        {/* 5. File Upload (Base64) */}
                         {mediaType !== 'TEXT' && (
-                            <div>
+                            <div className="space-y-2">
                                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                                    {mediaType === 'IMAGE' ? 'Image URL' : 'Video URL'}
+                                    Upload {mediaType === 'IMAGE' ? 'Image' : 'Video'} (Max 1.5MB)
                                 </label>
-                                <input
-                                    type="text"
-                                    value={mediaUrl}
-                                    onChange={(e) => setMediaUrl(e.target.value)}
-                                    placeholder="https://..."
-                                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-gray-900 dark:text-white"
-                                />
+
+                                {/* Drag & Drop Area */}
+                                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:bg-gray-50 dark:hover:bg-gray-700 transition relative">
+                                    <input
+                                        type="file"
+                                        accept={mediaType === 'IMAGE' ? "image/*" : "video/*"}
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+
+                                            // 1.5MB Limit for Vercel Serverless
+                                            if (file.size > 1.5 * 1024 * 1024) {
+                                                alert("File too large! Must be under 1.5MB for the free plan.");
+                                                e.target.value = ''; // Reset
+                                                return;
+                                            }
+
+                                            // Convert to Base64
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                                setMediaUrl(reader.result as string);
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    />
+                                    <div className="text-gray-500 dark:text-gray-400">
+                                        {mediaUrl ? (
+                                            <span className="text-green-600 font-bold">✅ File Selected</span>
+                                        ) : (
+                                            <>
+                                                <span className="text-2xl block mb-2">📂</span>
+                                                <span className="text-sm">Click or Drag file here</span>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                                {mediaUrl && (
+                                    <button
+                                        onClick={() => setMediaUrl('')}
+                                        className="text-xs text-red-500 hover:text-red-700 underline"
+                                    >
+                                        Remove File
+                                    </button>
+                                )}
                             </div>
                         )}
 
