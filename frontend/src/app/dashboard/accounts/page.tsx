@@ -7,17 +7,6 @@ interface SocialAccount {
     id: string;
     platform: string;
     profileName: string;
-}
-
-'use client';
-
-import { useState, useEffect } from 'react';
-import api from '../../../utils/api';
-
-interface SocialAccount {
-    id: string;
-    platform: string;
-    profileName: string;
     client: { name: string };
 }
 
