@@ -13,6 +13,7 @@ export default function Sidebar() {
         { name: 'Clients', href: '/dashboard/clients' },
         { name: 'Team', href: '/dashboard/team' },
         { name: 'Approvals', href: '/dashboard/approvals' },
+        { name: 'Security', href: '/dashboard/security' },
     ];
 
     return (
