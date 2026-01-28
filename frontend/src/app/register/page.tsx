@@ -25,7 +25,6 @@ export default function RegisterPage() {
     };
 
     return (
-    return (
         <div className="min-h-screen w-full flex items-center justify-center bg-[#030014] relative overflow-hidden">
             {/* Background Effects */}
             <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px]" />
