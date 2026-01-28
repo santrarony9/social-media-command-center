@@ -25,64 +25,60 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-black px-4 sm:px-6 lg:px-8">
-            <div className="w-full max-w-md space-y-8">
+    return (
+        <div className="min-h-screen w-full flex items-center justify-center bg-[#030014] relative overflow-hidden">
+            {/* Background Effects */}
+            <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px]" />
+            <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[100px]" />
+
+            <div className="w-full max-w-md p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl relative z-10 mx-4">
                 <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-                        Create a new account
+                    <h2 className="mt-2 text-center text-3xl font-extrabold text-white">
+                        Create Account
                     </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+                    <p className="mt-2 text-center text-sm text-gray-400">
                         Or{' '}
-                        <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                        <Link href="/login" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
                             sign in to your existing account
                         </Link>
                     </p>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div className="-space-y-px rounded-md shadow-sm">
+                    <div className="space-y-4">
                         <div>
-                            <label htmlFor="name" className="sr-only">
-                                Full Name
-                            </label>
                             <input
                                 id="name"
                                 name="name"
                                 type="text"
                                 autoComplete="name"
                                 required
-                                className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:bg-gray-800 dark:text-white dark:border-gray-700 sm:text-sm"
+                                className="appearance-none relative block w-full px-4 py-3 border border-white/10 bg-black/50 placeholder-gray-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-all"
                                 placeholder="Full Name"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                             />
                         </div>
                         <div>
-                            <label htmlFor="email-address" className="sr-only">
-                                Email address
-                            </label>
                             <input
                                 id="email-address"
                                 name="email"
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className="relative block w-full appearance-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:bg-gray-800 dark:text-white dark:border-gray-700 sm:text-sm"
+                                className="appearance-none relative block w-full px-4 py-3 border border-white/10 bg-black/50 placeholder-gray-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-all"
                                 placeholder="Email address"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
                         <div>
-                            <label htmlFor="password" className="sr-only">
-                                Password
-                            </label>
                             <input
                                 id="password"
                                 name="password"
                                 type="password"
                                 autoComplete="new-password"
                                 required
-                                className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:bg-gray-800 dark:text-white dark:border-gray-700 sm:text-sm"
+                                className="appearance-none relative block w-full px-4 py-3 border border-white/10 bg-black/50 placeholder-gray-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-all"
                                 placeholder="Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -91,7 +87,7 @@ export default function RegisterPage() {
                     </div>
 
                     {error && (
-                        <div className="text-red-500 text-sm text-center">
+                        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-200 text-sm text-center">
                             {error}
                         </div>
                     )}
@@ -99,7 +95,7 @@ export default function RegisterPage() {
                     <div>
                         <button
                             type="submit"
-                            className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 shadow-lg hover:shadow-indigo-500/30"
                         >
                             Sign up
                         </button>
