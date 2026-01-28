@@ -34,7 +34,7 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl mb-6">
               Master Your <br />
-              <span className="text-gradient">Digital Reality</span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">Digital Reality</span>
             </h1>
             <p className="mt-6 text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
               DP Connect is the ultimate command center for modern brands.
@@ -42,7 +42,7 @@ export default function Home() {
               elegant interface.
             </p>
             <div className="mt-10 flex justify-center gap-4">
-              <Link href="/register" className="btn-primary-static">
+              <Link href="/register" className="relative w-full px-8 py-3 text-lg font-bold text-white transition-all duration-200 bg-indigo-600 rounded-full hover:bg-indigo-500 hover:shadow-lg hover:-translate-y-0.5 hover:shadow-indigo-500/30">
                 Start Controlling Now
               </Link>
             </div>
@@ -61,7 +61,7 @@ export default function Home() {
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="bg-glass p-8 rounded-2xl hover:border-indigo-500/50 transition-colors group">
+            <div className="bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl p-8 rounded-2xl hover:border-indigo-500/50 transition-colors group">
               <div className="w-12 h-12 bg-indigo-500/10 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
               </div>
@@ -70,7 +70,7 @@ export default function Home() {
             </div>
 
             {/* Feature 2 */}
-            <div className="bg-glass p-8 rounded-2xl hover:border-purple-500/50 transition-colors group">
+            <div className="bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl p-8 rounded-2xl hover:border-purple-500/50 transition-colors group">
               <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
               </div>
@@ -79,7 +79,7 @@ export default function Home() {
             </div>
 
             {/* Feature 3 */}
-            <div className="bg-glass p-8 rounded-2xl hover:border-pink-500/50 transition-colors group">
+            <div className="bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl p-8 rounded-2xl hover:border-pink-500/50 transition-colors group">
               <div className="w-12 h-12 bg-pink-500/10 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               </div>

@@ -22,34 +22,9 @@ body {
 
 /* Premium Dark Theme Overrides */
 .dark body {
-    background-color: #030014; /* Deep space blue-black */
-    background-image: 
-        radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.08), transparent 25%), 
-        radial-gradient(circle at 85% 30%, rgba(124, 58, 237, 0.08), transparent 25%);
-}
-
-@layer utilities {
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400;
-  }
-  
-  .bg-glass {
-    @apply bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl;
-  }
-
-  .btn-primary {
-    @apply relative inline-flex items-center justify-center px-8 py-3 overflow-hidden font-medium text-white transition duration-300 ease-out border shadow-md group rounded-full;
-  }
-  
-  .btn-primary-bg {
-    @apply absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 -translate-x-full bg-indigo-600 group-hover:translate-x-0 ease;
-  }
-  
-  .btn-primary-text {
-    @apply absolute flex items-center justify-center w-full h-full text-white transition-all duration-300 transform group-hover:translate-x-full ease;
-  }
-  
-  .btn-primary-static {
-     @apply relative w-full px-8 py-3 text-lg font-bold text-white transition-all duration-200 bg-indigo-600 rounded-full hover:bg-indigo-500 hover:shadow-lg hover:-translate-y-0.5 hover:shadow-indigo-500/30;
-  }
+  background-color: #030014;
+  /* Deep space blue-black */
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.08), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(124, 58, 237, 0.08), transparent 25%);
 }
