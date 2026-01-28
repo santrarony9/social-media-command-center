@@ -10,7 +10,14 @@ export class PostsController {
     constructor(private readonly postsService: PostsService) { }
 
     @Post()
-    create(@Request() req: any, @Body() createPostDto: { content: string; clientId: string; mediaUrls?: string[], scheduledAt?: string }) {
+    create(@Request() req: any, @Body() createPostDto: {
+        content: string;
+        clientId: string;
+        mediaUrls?: string[];
+        mediaType?: string;
+        platforms?: string[];
+        scheduledAt?: string
+    }) {
         const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
         // Auto-approve for Admins, otherwise Pending
         let status = 'DRAFT';
@@ -23,6 +30,8 @@ export class PostsController {
             clientId: createPostDto.clientId,
             creatorId: req.user.userId,
             mediaUrls: createPostDto.mediaUrls || [],
+            mediaType: createPostDto.mediaType || 'TEXT',
+            platforms: (createPostDto.platforms as any) || [],
             scheduledAt: createPostDto.scheduledAt ? new Date(createPostDto.scheduledAt) : null,
             status: status as any,
         });

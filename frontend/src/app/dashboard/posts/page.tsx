@@ -6,6 +6,9 @@ import api from '../../../utils/api';
 interface Post {
     id: string;
     content: string;
+    mediaUrls: string[];
+    mediaType: string;
+    platforms: string[];
     status: string;
     scheduledAt: string | null;
     client: { name: string };
@@ -17,6 +20,14 @@ interface Client {
     name: string;
 }
 
+const PLATFORMS = [
+    { id: 'FACEBOOK', icon: '📘', label: 'Facebook' },
+    { id: 'INSTAGRAM', icon: '📸', label: 'Instagram' },
+    { id: 'TWITTER', icon: '🐦', label: 'X (Twitter)' },
+    { id: 'LINKEDIN', icon: '💼', label: 'LinkedIn' },
+    { id: 'YOUTUBE', icon: '▶️', label: 'YouTube' },
+];
+
 export default function PostsPage() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [clients, setClients] = useState<Client[]>([]);
@@ -26,6 +37,10 @@ export default function PostsPage() {
     const [content, setContent] = useState('');
     const [scheduledAt, setScheduledAt] = useState('');
     const [selectedClientId, setSelectedClientId] = useState('');
+    const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+    const [mediaType, setMediaType] = useState('TEXT'); // TEXT, IMAGE, VIDEO
+    const [mediaUrl, setMediaUrl] = useState('');
+
     const [isCreating, setIsCreating] = useState(false);
 
     useEffect(() => {
@@ -50,20 +65,34 @@ export default function PostsPage() {
         }
     };
 
+    const togglePlatform = (id: string) => {
+        if (selectedPlatforms.includes(id)) {
+            setSelectedPlatforms(selectedPlatforms.filter(p => p !== id));
+        } else {
+            setSelectedPlatforms([...selectedPlatforms, id]);
+        }
+    };
+
     const handleCreatePost = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedClientId) return alert('Please create a Client first / Connect an account');
+        if (!selectedClientId) return alert('Select a client first');
+        if (selectedPlatforms.length === 0) return alert('Select at least one platform');
 
         try {
             await api.post('/posts', {
                 content,
                 clientId: selectedClientId,
+                mediaUrls: mediaUrl ? [mediaUrl] : [],
+                mediaType,
+                platforms: selectedPlatforms,
                 scheduledAt: scheduledAt || undefined,
             });
 
-            // Reset and refresh
+            // Reset
             setContent('');
-            setScheduledAt('');
+            setMediaUrl('');
+            setMediaType('TEXT');
+            setSelectedPlatforms([]);
             setIsCreating(false);
             fetchData();
         } catch (err: any) {
@@ -72,13 +101,11 @@ export default function PostsPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this post?')) return;
+        if (!confirm('Are you sure?')) return;
         try {
             await api.delete(`/posts/${id}`);
             setPosts(posts.filter(p => p.id !== id));
-        } catch (err) {
-            alert('Failed to delete post');
-        }
+        } catch (err) { alert('Failed delete'); }
     };
 
     return (
@@ -93,103 +120,235 @@ export default function PostsPage() {
                 </button>
             </div>
 
-            {/* Create Post Form */}
+            {/* CREATE POST COMPOSER */}
             {isCreating && (
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow animate-in fade-in slide-in-from-top-4">
-                    <h2 className="text-xl font-semibold mb-4 dark:text-white">Draft New Content</h2>
-                    <form onSubmit={handleCreatePost} className="space-y-4">
+                <div className="flex flex-col lg:flex-row gap-6 animate-in fade-in slide-in-from-top-4">
+                    {/* Left: Input Form */}
+                    <div className="flex-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-4">
+                        <h2 className="text-xl font-bold dark:text-white mb-4">Composer</h2>
+
+                        {/* 1. Client Select */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Select Client / Brand</label>
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Brand Identity</label>
                             <select
                                 value={selectedClientId}
                                 onChange={(e) => setSelectedClientId(e.target.value)}
-                                className="mt-1 block w-full p-2 border rounded dark:bg-gray-700 dark:text-white"
+                                className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-gray-900 dark:text-white"
                             >
                                 {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                             </select>
                         </div>
 
+                        {/* 2. Platform Select */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Post Content</label>
-                            <div className="relative">
-                                <textarea
-                                    value={content}
-                                    onChange={(e) => setContent(e.target.value)}
-                                    className="mt-1 block w-full p-2 border rounded h-32 dark:bg-gray-700 dark:text-white pb-10"
-                                    placeholder="What's on your mind?..."
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={async () => {
-                                        if (!content || content.length < 5) return alert('Write at least 5 words first!');
-                                        try {
-                                            const res = await api.post('/seo/optimize', { content, industry: 'General' });
-                                            setContent(res.data.optimizedContent);
-                                        } catch (e) { alert('AI Generation Failed'); }
-                                    }}
-                                    className="absolute bottom-2 right-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs px-3 py-1 rounded-full shadow hover:shadow-pink-500/50 flex items-center gap-1"
-                                >
-                                    ✨ AI Enhance
-                                </button>
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Target Platforms</label>
+                            <div className="flex gap-2 flex-wrap">
+                                {PLATFORMS.map(p => (
+                                    <button
+                                        key={p.id}
+                                        type="button"
+                                        onClick={() => togglePlatform(p.id)}
+                                        className={`flex items-center gap-2 px-3 py-2 rounded border transition ${selectedPlatforms.includes(p.id)
+                                                ? 'bg-indigo-600 text-white border-indigo-600'
+                                                : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                            }`}
+                                    >
+                                        <span>{p.icon}</span>
+                                        <span className="text-sm font-medium">{p.label}</span>
+                                    </button>
+                                ))}
                             </div>
                         </div>
 
+                        {/* 3. Media Type */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Schedule (Optional)</label>
-                            <input
-                                type="datetime-local"
-                                value={scheduledAt}
-                                onChange={(e) => setScheduledAt(e.target.value)}
-                                className="mt-1 block w-full p-2 border rounded dark:bg-gray-700 dark:text-white"
-                            />
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Content Format</label>
+                            <div className="flex bg-gray-100 dark:bg-gray-900 p-1 rounded-lg inline-flex">
+                                {['TEXT', 'IMAGE', 'VIDEO'].map(type => (
+                                    <button
+                                        key={type}
+                                        type="button"
+                                        onClick={() => setMediaType(type)}
+                                        className={`px-4 py-1.5 rounded-md text-sm font-bold transition ${mediaType === type
+                                                ? 'bg-white dark:bg-gray-700 shadow text-indigo-600 dark:text-white'
+                                                : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                            }`}
+                                    >
+                                        {type}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
-                        <button type="submit" className="w-full bg-indigo-600 text-white p-3 rounded font-bold hover:bg-indigo-700">
-                            🚀 Launch Post
-                        </button>
-                    </form>
+                        {/* 4. Content Input */}
+                        <div className="relative">
+                            <textarea
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                className="w-full p-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg h-40 resize-none text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                placeholder="Write your masterpiece..."
+                            />
+                            <button
+                                type="button"
+                                onClick={async () => {
+                                    if (!content || content.length < 5) return alert('Write more first!');
+                                    try {
+                                        const res = await api.post('/seo/optimize', { content, industry: 'General' });
+                                        setContent(res.data.optimizedContent);
+                                    } catch (e) { alert('AI Failed'); }
+                                }}
+                                className="absolute bottom-3 right-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs px-3 py-1 rounded-full shadow hover:shadow-cyan-500/50 flex items-center gap-1"
+                            >
+                                ✨ AI Enhance
+                            </button>
+                        </div>
+
+                        {/* 5. Media URL Input (If Image/Video) */}
+                        {mediaType !== 'TEXT' && (
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                                    {mediaType === 'IMAGE' ? 'Image URL' : 'Video URL'}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={mediaUrl}
+                                    onChange={(e) => setMediaUrl(e.target.value)}
+                                    placeholder="https://..."
+                                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-gray-900 dark:text-white"
+                                />
+                            </div>
+                        )}
+
+                        {/* 6. Schedule & Action */}
+                        <div className="flex gap-4 items-end pt-4 border-t border-gray-100 dark:border-gray-700">
+                            <div className="flex-1">
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Schedule (Optional)</label>
+                                <input
+                                    type="datetime-local"
+                                    value={scheduledAt}
+                                    onChange={(e) => setScheduledAt(e.target.value)}
+                                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-gray-900 dark:text-white"
+                                />
+                            </div>
+                            <button
+                                onClick={handleCreatePost}
+                                className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded shadow-lg shadow-indigo-500/30 transition transform hover:scale-[1.02]"
+                            >
+                                🚀 Launch Post
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Right: Preview Card */}
+                    <div className="w-full lg:w-96">
+                        <h2 className="text-xl font-bold dark:text-white mb-4">Preview</h2>
+
+                        {/* Mock Phone Preview */}
+                        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[2rem] overflow-hidden shadow-2xl max-w-sm mx-auto p-4 min-h-[500px] relative">
+                            {/* Status Bar Mock */}
+                            <div className="flex justify-between text-xs text-gray-400 mb-4 px-2">
+                                <span>9:41</span>
+                                <span>📶 🔋</span>
+                            </div>
+
+                            {/* Header */}
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold">
+                                    B
+                                </div>
+                                <div>
+                                    <div className="font-bold text-sm dark:text-white">Brand Name</div>
+                                    <div className="text-xs text-gray-500">Sponsored • 🌍</div>
+                                </div>
+                            </div>
+
+                            {/* Content */}
+                            <div className="space-y-3">
+                                <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
+                                    {content || "Your caption goes here..."}
+                                </p>
+
+                                {/* Media Preview */}
+                                {mediaType === 'IMAGE' && (
+                                    <div className="aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
+                                        {mediaUrl ? (
+                                            <img src={mediaUrl} alt="Preview" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span className="text-gray-400">Image Preview</span>
+                                        )}
+                                    </div>
+                                )}
+                                {mediaType === 'VIDEO' && (
+                                    <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center text-gray-500">
+                                        ▶️ Video
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Footer Actions */}
+                            <div className="flex gap-4 mt-4 text-xl text-gray-400">
+                                <span>❤️</span> <span>💬</span> <span>✈️</span>
+                            </div>
+
+                            {/* Platforms Tags */}
+                            <div className="absolute bottom-4 left-4 right-4 flex gap-1 flex-wrap">
+                                {selectedPlatforms.map(p => (
+                                    <span key={p} className="text-[10px] bg-indigo-500 text-white px-1.5 py-0.5 rounded">
+                                        {p}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
 
-            {/* Posts List */}
-            <div className="grid gap-4">
-                {loading ? (
-                    <p>Loading content...</p>
-                ) : posts.length === 0 ? (
-                    <div className="text-center py-10 text-gray-500 dark:text-gray-400">
-                        <p className="text-xl">No posts yet.</p>
-                        <p>Create your first post to start the magic!</p>
-                    </div>
-                ) : (
-                    posts.map(post => (
-                        <div key={post.id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border-l-4 border-purple-500 flex justify-between items-start">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className={`px-2 py-1 text-xs rounded font-bold ${post.status === 'PUBLISHED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                                        {post.status}
+            {/* Existing Posts List Grid */}
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                {posts.map(post => (
+                    <div key={post.id} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-700 hover:border-indigo-500/30 transition group">
+                        {/* Media Thumbnail */}
+                        <div className="bg-gray-100 dark:bg-gray-900 h-48 flex items-center justify-center overflow-hidden relative">
+                            {post.mediaType === 'IMAGE' && post.mediaUrls[0] ? (
+                                <img src={post.mediaUrls[0]} alt="Post" className="w-full h-full object-cover" />
+                            ) : post.mediaType === 'VIDEO' ? (
+                                <div className="text-4xl">▶️</div>
+                            ) : (
+                                <div className="text-4xl text-gray-300">📝</div>
+                            )}
+                            <div className="absolute top-2 right-2 flex gap-1">
+                                {post.platforms?.map((p: any) => (
+                                    <span key={p} className="text-[10px] bg-black/50 backdrop-blur text-white px-2 py-1 rounded">
+                                        {p}
                                     </span>
-                                    <span className="text-sm text-gray-500">{post.client.name}</span>
-                                </div>
-                                <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{post.content}</p>
-                                {post.scheduledAt && (
-                                    <p className="text-xs text-indigo-400 mt-2">🕒 Scheduled for: {new Date(post.scheduledAt).toLocaleString()}</p>
-                                )}
-                            </div>
-                            <div className="flex flex-col items-end gap-2 ml-4">
-                                <div className="text-sm text-gray-400">
-                                    {new Date(post.createdAt).toLocaleDateString()}
-                                </div>
-                                <button
-                                    onClick={() => handleDelete(post.id)}
-                                    className="text-red-400 hover:text-red-500 text-xs border border-red-500/30 px-2 py-1 rounded bg-red-500/10 hover:bg-red-500/20 transition"
-                                >
-                                    🗑️ Delete
-                                </button>
+                                ))}
                             </div>
                         </div>
-                    ))
-                )}
+
+                        <div className="p-5">
+                            <div className="flex justify-between items-start mb-3">
+                                <span className={`px-2 py-1 text-xs rounded font-bold ${post.status === 'PUBLISHED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                    {post.status}
+                                </span>
+                                <button
+                                    onClick={() => handleDelete(post.id)}
+                                    className="text-gray-400 hover:text-red-500 transition"
+                                >
+                                    🗑️
+                                </button>
+                            </div>
+
+                            <p className="text-gray-800 dark:text-gray-200 text-sm line-clamp-3 mb-4">
+                                {post.content}
+                            </p>
+
+                            <div className="flex justify-between items-center text-xs text-gray-500 border-t border-gray-100 dark:border-gray-700 pt-3">
+                                <span>{post.client.name}</span>
+                                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );

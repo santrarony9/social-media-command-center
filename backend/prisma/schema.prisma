@@ -110,6 +110,8 @@ model Post {
   id           String     @id @default(uuid())
   content      String
   mediaUrls    String[] 
+  mediaType    String     @default("TEXT") // IMAGE, VIDEO, REEL, CAROUSEL
+  platforms    SocialPlatform[] // Which platforms this post is for 
   scheduledAt  DateTime?
   publishedAt  DateTime?
   status       PostStatus @default(DRAFT)
