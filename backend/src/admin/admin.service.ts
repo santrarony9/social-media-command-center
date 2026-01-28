@@ -55,6 +55,12 @@ export class AdminService {
         });
     }
 
+    async deleteEmployee(id: string) {
+        return this.prisma.user.delete({
+            where: { id, role: 'EMPLOYEE' } // Security: Ensure we only delete employees, not other admins
+        });
+    }
+
     async getAllEmployees() {
         return this.prisma.user.findMany({
             where: { role: 'EMPLOYEE' },

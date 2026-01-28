@@ -210,7 +210,18 @@ export default function TeamPage() {
                             >
                                 Assign Client
                             </button>
-                            <button className="flex-1 text-xs bg-white/5 hover:bg-red-500/20 py-2 rounded text-gray-300 hover:text-red-400">Disable</button>
+                            <button
+                                onClick={async () => {
+                                    if (!confirm(`Are you sure you want to remove ${emp.name}?`)) return;
+                                    try {
+                                        await api.delete(`/admin/employees/${emp.id}`);
+                                        setEmployees(employees.filter(e => e.id !== emp.id));
+                                    } catch (e) { alert('Failed to remove employee'); }
+                                }}
+                                className="flex-1 text-xs bg-white/5 hover:bg-red-500/20 py-2 rounded text-red-300 hover:text-red-400 border border-transparent hover:border-red-500/30 transition"
+                            >
+                                Delete Member
+                            </button>
                         </div>
                     </div>
                 ))}
