@@ -25,6 +25,8 @@ enum PermissionLevel {
 enum PostStatus {
   DRAFT
   PENDING_APPROVAL
+  APPROVED
+  REJECTED
   SCHEDULED
   PUBLISHED
   FAILED
@@ -45,6 +47,9 @@ model User {
   password  String
   name      String?
   role      Role     @default(EMPLOYEE)
+  jobTitle  String?  // e.g. "Senior Copywriter"
+  isActive  Boolean  @default(true)
+  lastLogin DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -55,12 +60,15 @@ model User {
 }
 
 model Client {
-  id        String   @id @default(uuid())
-  name      String
-  industry  String?
-  timezone  String   @default("UTC")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(uuid())
+  name            String
+  industry        String?
+  timezone        String   @default("UTC")
+  seoKeywords     String[] // Brand-specific mandatory keywords
+  brandHashtags   String[] // Mandatory hashtags
+  approvalRequired Boolean @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Relations
   access         ClientAccess[]
@@ -85,7 +93,7 @@ model ClientAccess {
 model SocialAccount {
   id           String         @id @default(uuid())
   platform     SocialPlatform
-  platformId   String // ID from the platform (e.g. Page ID)
+  platformId   String 
   accessToken  String
   refreshToken String?
   tokenExpires DateTime?
@@ -101,11 +109,14 @@ model SocialAccount {
 model Post {
   id           String     @id @default(uuid())
   content      String
-  mediaUrls    String[] // Array of S3 URLs
+  mediaUrls    String[] 
   scheduledAt  DateTime?
   publishedAt  DateTime?
   status       PostStatus @default(DRAFT)
-  platformArgs Json? // Platform specific options (e.g. first comment, tags)
+  platformArgs Json? 
+  seoScore     Int        @default(0)
+  approvalLog  Json?      // Store rejection reasons or approval metadata
+  
   clientId     String
   creatorId    String
   createdAt    DateTime   @default(now())
@@ -117,9 +128,11 @@ model Post {
 
 model AuditLog {
   id        String   @id @default(uuid())
-  action    String
+  action    String   // e.g. "LOGIN", "CREATE_POST", "APPROVE_POST"
+  resource  String?  // e.g. "Post:123"
   details   Json?
   userId    String
+  ipAddress String?
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])

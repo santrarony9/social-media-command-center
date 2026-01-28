@@ -11,6 +11,7 @@ export default function Sidebar() {
         { name: 'Accounts', href: '/dashboard/accounts' },
         { name: 'Posts', href: '/dashboard/posts' },
         { name: 'Clients', href: '/dashboard/clients' },
+        { name: 'Team', href: '/dashboard/team' },
     ];
 
     return (
@@ -26,8 +27,8 @@ export default function Sidebar() {
                             key={item.name}
                             href={item.href}
                             className={`group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 ${isActive
-                                    ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20'
-                                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20'
+                                : 'text-gray-400 hover:bg-white/5 hover:text-white'
                                 }`}
                         >
                             {item.name}
