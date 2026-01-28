@@ -101,13 +101,28 @@ export default function PostsPage() {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Post Content</label>
-                            <textarea
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                className="mt-1 block w-full p-2 border rounded h-32 dark:bg-gray-700 dark:text-white"
-                                placeholder="What's on your mind?..."
-                                required
-                            />
+                            <div className="relative">
+                                <textarea
+                                    value={content}
+                                    onChange={(e) => setContent(e.target.value)}
+                                    className="mt-1 block w-full p-2 border rounded h-32 dark:bg-gray-700 dark:text-white pb-10"
+                                    placeholder="What's on your mind?..."
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={async () => {
+                                        if (!content || content.length < 5) return alert('Write at least 5 words first!');
+                                        try {
+                                            const res = await api.post('/seo/optimize', { content, industry: 'General' });
+                                            setContent(res.data.optimizedContent);
+                                        } catch (e) { alert('AI Generation Failed'); }
+                                    }}
+                                    className="absolute bottom-2 right-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs px-3 py-1 rounded-full shadow hover:shadow-pink-500/50 flex items-center gap-1"
+                                >
+                                    ✨ AI Enhance
+                                </button>
+                            </div>
                         </div>
 
                         <div>

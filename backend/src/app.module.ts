@@ -8,9 +8,10 @@ import { ClientsModule } from './clients/clients.module';
 import { PostsModule } from './posts/posts.module';
 import { SocialAccountsModule } from './social-accounts/social-accounts.module';
 import { AdminModule } from './admin/admin.module';
+import { SeoModule } from './seo/seo.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, ClientsModule, PostsModule, SocialAccountsModule, AdminModule],
+  imports: [PrismaModule, UsersModule, AuthModule, ClientsModule, PostsModule, SocialAccountsModule, AdminModule, SeoModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -12,8 +12,10 @@ export class PostsService {
         });
     }
 
-    async findAll(clientId?: string) {
-        const where: Prisma.PostWhereInput = clientId ? { clientId } : {};
+    async findAll(clientId?: string, status?: string) {
+        const where: Prisma.PostWhereInput = {};
+        if (clientId) where.clientId = clientId;
+        if (status) where.status = status as any;
         return this.prisma.post.findMany({
             where,
             include: {
@@ -48,6 +50,26 @@ export class PostsService {
     async remove(id: string) {
         return this.prisma.post.delete({
             where: { id },
+        });
+    }
+
+    async approve(id: string) {
+        return this.prisma.post.update({
+            where: { id },
+            data: {
+                status: 'APPROVED',
+                approvalLog: { approvedAt: new Date() }
+            },
+        });
+    }
+
+    async reject(id: string, reason: string) {
+        return this.prisma.post.update({
+            where: { id },
+            data: {
+                status: 'REJECTED',
+                approvalLog: { rejectedAt: new Date(), reason }
+            },
         });
     }
 }

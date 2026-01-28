@@ -12,6 +12,7 @@ export default function Sidebar() {
         { name: 'Posts', href: '/dashboard/posts' },
         { name: 'Clients', href: '/dashboard/clients' },
         { name: 'Team', href: '/dashboard/team' },
+        { name: 'Approvals', href: '/dashboard/approvals' },
     ];
 
     return (
