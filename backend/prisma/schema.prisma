@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  EMPLOYEE
+}
+
+enum PermissionLevel {
+  FULL_ACCESS
+  CONTENT_ONLY
+  ANALYTICS_ONLY
+  NONE
+}
+
+enum PostStatus {
+  DRAFT
+  PENDING_APPROVAL
+  SCHEDULED
+  PUBLISHED
+  FAILED
+}
+
+enum SocialPlatform {
+  FACEBOOK
+  INSTAGRAM
+  LINKEDIN
+  YOUTUBE
+  TWITTER
+  THREADS
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(EMPLOYEE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  clientAccess ClientAccess[]
+  posts        Post[]         @relation("PostCreator")
+  auditLogs    AuditLog[]
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  industry  String?
+  timezone  String   @default("UTC")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  access         ClientAccess[]
+  socialAccounts SocialAccount[]
+  posts          Post[]
+}
+
+model ClientAccess {
+  id              String          @id @default(uuid())
+  userId          String
+  clientId        String
+  permissionLevel PermissionLevel @default(NONE)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, clientId])
+}
+
+model SocialAccount {
+  id           String         @id @default(uuid())
+  platform     SocialPlatform
+  platformId   String // ID from the platform (e.g. Page ID)
+  accessToken  String
+  refreshToken String?
+  tokenExpires DateTime?
+  profileName  String?
+  profilePic   String?
+  clientId     String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id           String     @id @default(uuid())
+  content      String
+  mediaUrls    String[] // Array of S3 URLs
+  scheduledAt  DateTime?
+  publishedAt  DateTime?
+  status       PostStatus @default(DRAFT)
+  platformArgs Json? // Platform specific options (e.g. first comment, tags)
+  clientId     String
+  creatorId    String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  client  Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  creator User   @relation("PostCreator", fields: [creatorId], references: [id])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  details   Json?
+  userId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
